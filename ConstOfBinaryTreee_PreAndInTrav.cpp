@@ -3,6 +3,7 @@
 using namespace std;
 
 // construction of a binary tree using preorder and inorder Traversal
+//with and without the help of map
 
 class Node{
     public:
@@ -89,7 +90,15 @@ int searchInorder(int inorder[], int size, int target){
     return -1;
 }
 
-Node* constructTreeFromPreAndIn(int inorder[],int preorder[],int size,int &preIndex, int inorderStart,int inorderEnd ){
+void createMapping(int inorder[], int size, map<int, int> & valuetoMapindex){
+    for(int i = 0; i < size; i++){
+        int element = inorder[i];
+        int index = i;
+        valuetoMapindex[element]= index;
+    }
+}
+
+Node* constructTreeFromPreAndIn(map<int,int> valuetoMapindex,int inorder[],int preorder[],int size,int &preIndex, int inorderStart,int inorderEnd ){
 
     // base case
     if(preIndex >= size || inorderStart > inorderEnd){
@@ -102,11 +111,12 @@ Node* constructTreeFromPreAndIn(int inorder[],int preorder[],int size,int &preIn
     Node* root = new Node(element);
 
     // searching element for root -> left from inorder
-    int position = searchInorder(inorder, size, element);
+    // int position = searchInorder(inorder, size, element);
+    int position = valuetoMapindex[element];
 
     //recursion
-    root -> left = constructTreeFromPreAndIn(inorder, preorder, size, preIndex, inorderStart, position-1);
-    root -> right = constructTreeFromPreAndIn(inorder, preorder, size, preIndex, position+1, inorderEnd);
+    root -> left = constructTreeFromPreAndIn(valuetoMapindex,inorder, preorder, size, preIndex, inorderStart, position-1);
+    root -> right = constructTreeFromPreAndIn(valuetoMapindex,inorder, preorder, size, preIndex, position+1, inorderEnd);
 
     return root;
 
@@ -121,11 +131,11 @@ int main() {
     int preIndex = 0;
     int inorderStart = 0;
     int inorderEnd = 5;
-    
+    map<int,int> valuetoMapindex;
 
-    
+    createMapping(inorder,size, valuetoMapindex);
 
-    Node* root =  constructTreeFromPreAndIn(inorder, preorder, size, preIndex, inorderStart, inorderEnd);
+    Node* root =  constructTreeFromPreAndIn(valuetoMapindex,inorder, preorder, size, preIndex, inorderStart, inorderEnd);
     cout<< "Required Tree"<<endl;
     levelOrderTraversal(root);
     return 0;
